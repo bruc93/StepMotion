@@ -1,7 +1,7 @@
 package com.bignerdranch.android.stepmotion
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -21,16 +21,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var viewModel:StepMotionViewModel
 
-    private lateinit var tv_stepsTaken:TextView
+    private lateinit var textStepCount:TextView
+    private lateinit var textKcalBurnt:TextView
+    private lateinit var textDistanceWalked:TextView
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProvider(this).get(StepMotionViewModel::class.java)
 
-        tv_stepsTaken = findViewById(R.id.step_count)
-        tv_stepsTaken.text = viewModel.getTotalStep().toString();
+        textStepCount = findViewById(R.id.step_count)
+        textKcalBurnt = findViewById(R.id.kcal_text)
+        textDistanceWalked = findViewById(R.id.km_text)
+
+        //textDistanceWalked.text = viewModel.getDistanceWalkedKM().toString() + " KM"
+        textDistanceWalked.text = String.format("%.2f", viewModel.getDistanceWalkedKM()) + " KM"
+        textKcalBurnt.text = viewModel.getKcalBurnt().toInt().toString() + " KCAL"
+        textStepCount.text = viewModel.getTotalStep().toInt().toString();
 
         loadData()
 
@@ -43,7 +52,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onResume() {
         super.onResume()
         viewModel.setRunning(true)
-        
+
         val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
         if(stepSensor == null){
@@ -58,27 +67,31 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onSensorChanged(event: SensorEvent) {
         if(viewModel.getIfRunning())
         {
             viewModel.setTotalStep(event.values[0])
 
-            tv_stepsTaken.text =  viewModel.getCurrentStep().toString()
-
+            textStepCount.text =  viewModel.getCurrentStep().toInt().toString()
+            textKcalBurnt.text = viewModel.getKcalBurnt().toInt().toString() + " KCAL"
+            textDistanceWalked.text = String.format("%.2f", viewModel.getDistanceWalkedKM()) + " KM"
             progress_circular.apply {
                 setProgressWithAnimation(viewModel.getCurrentStep())
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
     fun resetSteps(){
-        tv_stepsTaken.setOnClickListener{
+        textStepCount.setOnClickListener{
             Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
         }
-        tv_stepsTaken.setOnLongClickListener{
+        textStepCount.setOnLongClickListener{
             viewModel.setPreviousTotalSteps(viewModel.getTotalStep())
-            tv_stepsTaken.text = 0.toString()
-
+            textStepCount.text = 0.toString()
+            textKcalBurnt.text = 0.toString() + " KCAL"
+            textDistanceWalked.text = 0.toString() + " KM"
             saveData()
 
             progress_circular.apply {
