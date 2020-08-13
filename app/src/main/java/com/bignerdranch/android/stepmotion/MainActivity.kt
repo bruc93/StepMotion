@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         val mainFragment = MainFragment()
         val meFragment = MeFragment()
+        val statsFragment = StatsFragment()
 
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.flFragment, mainFragment)
@@ -47,6 +48,13 @@ class MainActivity : AppCompatActivity() {
         buttonHealth.setOnClickListener{
             supportFragmentManager.beginTransaction().apply {
                 replace(R.id.flFragment, mainFragment)
+                commit()
+            }
+        }
+
+        buttonStats.setOnClickListener{
+            supportFragmentManager.beginTransaction().apply {
+                replace(R.id.flFragment, statsFragment)
                 commit()
             }
         }

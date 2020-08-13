@@ -64,15 +64,7 @@ class MainFragment : Fragment(), SensorEventListener {
         textKcalBurnt = view.findViewById(R.id.kcal_text)
         textDistanceWalked = view.findViewById(R.id.km_text)
 
-
-        var stepeer = viewModel.getCurrentStep()
-        var stepeer2 = viewModel.getPreviousTotalSteps()
-        Log.d("getCurrentStep2", "$stepeer")
-        Log.d("getpreviusTotalStepp", "$stepeer2")
-        Log.d("fragment", "We createView the fragment!!!!")
-        textDistanceWalked.text = String.format("%.2f", viewModel.getDistanceWalkedKM()) + " KM"
-        textKcalBurnt.text = viewModel.getKcalBurnt().toInt().toString() + " KCAL"
-        textStepCount.text = viewModel.getCurrentStep().toInt().toString();
+        updateUI()
 
         textStepCount.setOnClickListener{
             Toast.makeText(this.activity, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
@@ -83,6 +75,17 @@ class MainFragment : Fragment(), SensorEventListener {
         }
 
         return view
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateUI() {
+        textDistanceWalked.text = String.format("%.2f", viewModel.getDistanceWalkedKM()) + " KM"
+        textKcalBurnt.text = viewModel.getKcalBurnt().toInt().toString() + " KCAL"
+        textStepCount.text = viewModel.getCurrentStep().toInt().toString();
+        
+        this.view?.progress_circular?.apply {
+            setProgressWithAnimation(viewModel.getCurrentStep())
+        }
     }
 
     @SuppressLint("ShowToast")
@@ -156,13 +159,8 @@ class MainFragment : Fragment(), SensorEventListener {
         {
             viewModel.setTotalStep(event!!.values[0])
         }
-        textStepCount.text = viewModel.getCurrentStep().toInt().toString()
-        textKcalBurnt.text = viewModel.getKcalBurnt().toInt().toString() + " KCAL"
-        textDistanceWalked.text = String.format("%.2f", viewModel.getDistanceWalkedKM()) + " KM"
-        this.view?.progress_circular?.apply {
-            setProgressWithAnimation(viewModel.getCurrentStep())
-        }
 
+        updateUI()
 
     }
 
